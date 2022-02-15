@@ -1,0 +1,30 @@
+{
+  "name": "pinnacle-chiro-provider-service",
+  "version": "0.3.0",
+  "author": "Samuel Gamage <sgamage@datafusionspecialists.com>",
+  "keywords": [
+    "provider",
+    "idaas",
+    "nodejs"
+  ],
+  "description": "Provider service for a fake provider known as Pinnacle Chiropractic",
+  "license": "apache-2.0",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:seed": "node src/seed.js"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "dayjs": "^1.10.7",
+    "express": "^4.17.2",
+    "faker": "5.5.3",
+    "kafkajs": "^1.15.0",
+    "node-cron": "^3.0.0",
+    "pg": "^8.7.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
