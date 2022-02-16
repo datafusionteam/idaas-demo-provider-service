@@ -1,3 +1,9 @@
+/*
+ * (C) Copyright Data Fusion Specialists. 2022
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const kafka = require("./kafka");
 const axios = require("axios");
 const { v4: uuid } = require("uuid");

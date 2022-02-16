@@ -1,4 +1,9 @@
-// Single source to handle all the env vars
+/*
+ * (C) Copyright Data Fusion Specialists. 2022
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 module.exports = {
   hapiFhir: {
     host: process.env.HAPI_FHIR_HOST,

@@ -1,3 +1,9 @@
+/*
+ * (C) Copyright Data Fusion Specialists. 2022
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 module.exports = {
   db: {
     host: process.env.DS_DB_HOST,

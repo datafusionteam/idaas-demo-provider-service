@@ -1,3 +1,9 @@
+/*
+ * (C) Copyright Data Fusion Specialists. 2022
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const { Kafka, logLevel } = require("kafkajs");
 
 const { KAFKA_USERNAME: username, KAFKA_PASSWORD: password } = process.env;

@@ -1,3 +1,9 @@
+/*
+ * (C) Copyright Data Fusion Specialists. 2022
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const dayjs = require("dayjs");
 const express = require("express");
 const config = require("./config");
@@ -16,11 +22,16 @@ const createApi = () => {
   app.use("/api", api);
 
   api.get("/getPatient", async (req, res) => {
-    const server = new FHIRServer(config.hapiFhir.host);
-    const patients = await server.search("Patient");
-    const patient =
-      patients[Math.floor(Math.random() * patients.length)].resource;
-    res.status(200).json(patient);
+    try {
+      const server = new FHIRServer(config.hapiFhir.host);
+      const patients = await server.search("Patient");
+      const patient =
+        patients[Math.floor(Math.random() * patients.length)].resource;
+      res.status(200).json(patient);
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
   });
 
   api.get("/findLocations", async (req, res) => {
@@ -45,10 +56,15 @@ const createApi = () => {
   api.get("/locations/:locationId/findPractitioners", async (req, res) => {
     const locationId = req.params.locationId;
     // TODO: use location id to create relation on practitioner
-    const server = new FHIRServer(config.hapiFhir.host);
-    const results = await server.search("Practitioner");
-    const practitioners = results.map((result) => result.resource);
-    res.status(200).json(practitioners);
+    try {
+      const server = new FHIRServer(config.hapiFhir.host);
+      const results = await server.search("Practitioner");
+      const practitioners = results.map((result) => result.resource);
+      res.status(200).json(practitioners);
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
   });
 
   api.get("/findSlots", (req, res) => {
