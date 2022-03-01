@@ -66,11 +66,30 @@ const generatePatientResource = async () => {
 /**
  * Generates a FHIR practitioner resource
  */
-const generatePractictionerResource = async (imageUrl) => {
+const generatePractictionerResource = async (i) => {
   const nameAndGender = await DataSynthesis.random.nameAndGender();
   const address = await DataSynthesis.random.address();
   const dob = await DataSynthesis.random.dob();
   const phoneNumber = await DataSynthesis.random.phoneNumber();
+
+  const femaleImageUrls = [
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-5-2.jpg",
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-16-1.jpg",
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-31-1.jpg",
+  ];
+  const maleImageUrls = [
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-17.jpg",
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-37-1.jpg",
+    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-38.jpg",
+  ];
+
+  let imageUrl;
+
+  if (nameAndGender.gender === "M") {
+    imageUrl = maleImageUrls[i % maleImageUrls.length];
+  } else {
+    imageUrl = femaleImageUrls[i % femaleImageUrls.length];
+  }
 
   return {
     resourceType: "Practitioner",
