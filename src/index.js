@@ -13,13 +13,17 @@ const { refreshTokens } = require("./oauth");
 const createApi = require("./api");
 const { FHIRServer } = require("./fhir");
 
+const Topics = {
+  FHIRAppointment: "fhirsvr_appointment",
+};
+
 const consumer = kafka.consumer({
   groupId: process.env.KAFKA_CONSUMER_GROUP_ID,
 });
 
 const processMessage = async (topic, partition, key, value) => {
   switch (topic) {
-    case "fhirsvr_appointment":
+    case Topics.FHIRAppointment:
       await handleAppointmentReceived(value);
       break;
     default:
@@ -179,7 +183,7 @@ const main = async () => {
 
   await consumer.subscribe({
     topic: config.kafkaTopic,
-  }); // subscribe to all appointment transactions
+  });
 
   console.log(`Consumer listening for topic '${config.kafkaTopic}'`);
 

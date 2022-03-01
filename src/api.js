@@ -56,6 +56,7 @@ const createApi = () => {
   api.get("/locations/:locationId/findPractitioners", async (req, res) => {
     const locationId = req.params.locationId;
     // TODO: use location id to create relation on practitioner
+
     try {
       const server = new FHIRServer(config.hapiFhir.host);
       const results = await server.search("Practitioner");

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Single source to handle all the env vars
 module.exports = {
   hapiFhir: {
     host: process.env.HAPI_FHIR_HOST,
