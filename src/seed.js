@@ -6,11 +6,7 @@
 
 const { FHIRServer } = require("./fhir");
 const config = require("./config");
-const { client, pool } = require("./db");
-const {
-  generatePatientResource,
-  generatePractictionerResource,
-} = require("./fhir/resources");
+const { generatePractictionerResource } = require("./fhir/resources");
 
 // Hard code some fixed locations for provider
 
@@ -164,43 +160,53 @@ const location4 = {
 
 const locationResources = [location1, location2, location3, location4];
 
-/**
- * Create relation tale for practitioners and locations
- */
-const createPractitionerLocationTable = async () => {
-  const query = `
-    CREATE TABLE IF NOT EXISTS practitioner_location (
-      practitioner_id INT NOT NULL,
-      location_id INT NOT NULL,
-      PRIMARY KEY (practitioner_id, location_id)
-    )
-  `;
-  await client.query(query);
+const patient1 = {
+  resourceType: "Patient",
+  identifier: [
+    {
+      system: "http://hl7.org/fhir/sid/us-ssn",
+      value: "721094426",
+    },
+  ],
+  active: true,
+  name: [
+    {
+      use: "usual",
+      text: "Sarah Lee Baker",
+      family: "Baker",
+      given: ["Sarah"],
+    },
+  ],
+  telecom: [
+    {
+      system: "phone",
+      value: "1112223333",
+      use: "mobile",
+      rank: "1",
+    },
+    {
+      system: "email",
+      value: `sarahbaker@example.com`,
+      use: "home",
+      rank: 2,
+    },
+  ],
+  gender: "female",
+  birthDate: "12-01-98",
+  address: [
+    {
+      use: "home",
+      type: "physical",
+      text: "123 Atlanta Rd",
+      city: "Atlanta",
+      state: "GA",
+      postalCode: "30332",
+      country: "US",
+    },
+  ],
 };
 
-/**
- * Insert into practitioner location table the relationship between practitioners and locations
- * @param {*} poolClient
- * @param {*} locationId
- * @param {*} practitionerId
- */
-const createPractitionerLocationRelation = async (
-  poolClient,
-  locationId,
-  practitionerId
-) => {
-  try {
-    await poolClient.query(
-      "INSERT INTO practitioner_location (location_id, practitioner_id) VALUES ($1, $2)",
-      [locationId, practitionerId]
-    );
-    console.log(
-      `Added practitioner ${practitionerId} to location ${locationId}`
-    );
-  } catch (error) {
-    console.error(error);
-  }
-};
+const patientResources = [patient1];
 
 /**
  * Seeds the provider directory with data
@@ -210,20 +216,11 @@ const seed = async () => {
     "Seeding provider HL7 FHIR server/directory. This may take a while..."
   );
 
-  await client.connect();
-  console.log("Dropping db...");
-  const query = `
-    DROP DATABASE IF EXISTS fhir
-  `;
-  await client.query(query);
-
   const fhirServer = new FHIRServer(config.hapiFhir.host);
 
-  const numPatientRecords = 50;
-  console.log(`Creating ${numPatientRecords} patient records`);
+  console.log(`Creating patient records`);
   const patients = [];
-  for (let i = 0; i < numPatientRecords; i++) {
-    const patientResource = await generatePatientResource();
+  for (const patientResource of patientResources) {
     const patient = await fhirServer.create("Patient", patientResource);
     patients.push(patient);
   }
@@ -235,50 +232,16 @@ const seed = async () => {
     locations.push(location);
   }
 
-  const numPractitioners = 8;
+  const numPractitioners = 6;
   console.log(`Creating ${numPractitioners} practitioners`);
   const practitioners = [];
   for (let i = 0; i < numPractitioners; i++) {
-    const femaleImageUrls = [
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-5-2.jpg",
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-16-1.jpg",
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-31-1.jpg",
-    ];
-    const maleImageUrls = [
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-17.jpg",
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-37-1.jpg",
-      "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-38.jpg",
-    ];
-
-    let imageUrl;
-
-    if (nameAndGender.gender === "M") {
-      imageUrl = maleImageUrls[i % maleImageUrls.length];
-    } else {
-      imageUrl = femaleImageUrls[i % femaleImageUrls.length];
-    }
-
-    const practitionerResource = await generatePractictionerResource(imageUrl);
+    const practitionerResource = await generatePractictionerResource(i);
     const practitioner = await fhirServer.create(
       "Practitioner",
       practitionerResource
     );
     practitioners.push(practitioner);
-  }
-
-  await createPractitionerLocationTable();
-
-  const poolClient = await pool.connect();
-
-  for (let i = 0; i < numPractitioners; i++) {
-    const practitioner = practitioners[i];
-    const location =
-      locationResources[Math.floor(Math.random() * locationResources.length)];
-    await createPractitionerLocationRelation(
-      poolClient,
-      location.id,
-      practitioner.id
-    );
   }
 
   console.log("Done seeding");
