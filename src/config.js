@@ -6,18 +6,15 @@
 
 // Single source to handle all the env vars
 module.exports = {
-  hapiFhir: {
-    host: process.env.HAPI_FHIR_HOST,
-    port: process.env.HAPI_FHIR_PORT || 8080,
-  },
-  idaasConnectUrl: process.env.IDAAS_CONNECT_URL || "idaas-connect:9982",
+  hapiFhirUrl: process.env.HAPI_FHIR_URL || "http://hapi-fhir:80",
+  idaasConnectUrl: process.env.IDAAS_CONNECT_URL || "http://idaas-connect:80",
   kafkaTopic: process.env.KAFKA_TOPIC || "fhirsvr_appointment",
   oauth: {
     tenantId: process.env.TENANT_ID,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
   },
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 8080,
   db: {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,

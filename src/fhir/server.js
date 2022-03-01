@@ -7,22 +7,14 @@
 const { Axios } = require("axios");
 
 class FHIRServer {
-  constructor(
-    host,
-    port = 8080,
-    protocol = "http",
-    basePath = "/hapi-fhir-jpaserver/fhir",
-    version = "R4"
-  ) {
+  constructor(url, basePath = "/hapi-fhir-jpaserver/fhir", version = "R4") {
     this.config = {
-      host,
-      port,
-      protocol,
+      url,
       basePath,
       version,
     };
     this.client = new Axios({
-      baseURL: `${this.config.protocol}://${this.config.host}:${this.config.port}${this.config.basePath}`,
+      baseURL: `${url}${this.config.basePath}`,
     });
   }
 

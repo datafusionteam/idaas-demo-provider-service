@@ -4,7 +4,6 @@ FROM node:14.17 as base
 RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
 WORKDIR /app
-EXPOSE 3000
 
 COPY --chown=node:node package.json yarn.lock ./
 COPY --chown=node:node src ./src
@@ -15,6 +14,8 @@ RUN /usr/local/bin/node-prune
 FROM base as development
 
 ENV NODE_ENV=development
+
+EXPOSE 8080
 
 CMD ["yarn", "dev"]
 
@@ -27,5 +28,7 @@ ENV NODE_ENV=production
 COPY --from=base /app/package.json .
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/src ./src
+
+EXPOSE 8080
 
 CMD ["yarn", "start"]

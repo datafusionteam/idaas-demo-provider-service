@@ -23,7 +23,7 @@ const createApi = () => {
 
   api.get("/getPatient", async (req, res) => {
     try {
-      const server = new FHIRServer(config.hapiFhir.host);
+      const server = new FHIRServer(config.hapiFhirUrl);
       const patients = await server.search("Patient");
       const patient =
         patients[Math.floor(Math.random() * patients.length)].resource;
@@ -41,7 +41,7 @@ const createApi = () => {
     const distanceUnits = req.query.units || "mi";
 
     try {
-      const server = new FHIRServer(config.hapiFhir.host);
+      const server = new FHIRServer(config.hapiFhirUrl);
       const results = await server.search("Location", {
         near: `${latitude}|${longitude}|${distance}|${distanceUnits}`,
       });
@@ -58,7 +58,7 @@ const createApi = () => {
     // TODO: use location id to create relation on practitioner
 
     try {
-      const server = new FHIRServer(config.hapiFhir.host);
+      const server = new FHIRServer(config.hapiFhirUrl);
       const results = await server.search("Practitioner");
       const practitioners = results.map((result) => result.resource);
       res.status(200).json(practitioners);

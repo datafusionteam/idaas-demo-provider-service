@@ -34,7 +34,7 @@ const processMessage = async (topic, partition, key, value) => {
 const handleAppointmentReceived = async (appointment) => {
   console.log("Received a request to schedule an appointment");
   console.log("Auto approving...");
-  const client = new FHIRServer(config.hapiFhir.host);
+  const client = new FHIRServer(config.hapiFhirUrl);
 
   const appointmentStart = appointment.start;
   const appointmentEnd = appointment.end;
@@ -150,7 +150,7 @@ const handleAppointmentReceived = async (appointment) => {
 
   console.log("Sending response back to iDaaS-Connect...");
   await axios.post(
-    `http://${config.idaasConnectUrl}/projherophilus/appointmentresponse`,
+    `${config.idaasConnectUrl}/projherophilus/appointmentresponse`,
     appointmentResponse
   );
   console.log("Sent to iDaaS-Connect");

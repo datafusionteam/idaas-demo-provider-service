@@ -216,7 +216,7 @@ const seed = async () => {
     "Seeding provider HL7 FHIR server/directory. This may take a while..."
   );
 
-  const fhirServer = new FHIRServer(config.hapiFhir.host);
+  const fhirServer = new FHIRServer(config.hapiFhirUrl);
 
   console.log(`Creating patient records`);
   const patients = [];
