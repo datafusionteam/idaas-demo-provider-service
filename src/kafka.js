@@ -24,7 +24,7 @@ const ssl = !!sasl;
 // This creates a client instance that is configured to connect to the Kafka broker provided by
 // the environment variable KAFKA_BOOTSTRAP_SERVER
 const kafka = new Kafka({
-  clientId: "pinnacle-chiro-provider-service",
+  clientId: "dfs-chiro-provider-service",
   brokers: [process.env.KAFKA_BOOTSTRAP_SERVER],
   logLevel: logLevel.ERROR,
   ssl,

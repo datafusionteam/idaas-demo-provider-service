@@ -1,5 +1,5 @@
 {
-  "name": "pinnacle-chiro-provider-service",
+  "name": "provider-service",
   "version": "0.5.0",
   "author": "Samuel Gamage <sgamage@datafusionspecialists.com>",
   "keywords": [
@@ -7,7 +7,7 @@
     "idaas",
     "nodejs"
   ],
-  "description": "Provider service for a fake provider known as Pinnacle Chiropractic",
+  "description": "Provider service for a fake provider known as DFS Chiropractic",
   "license": "Apache-2.0",
   "scripts": {
     "start": "node src/index.js",
