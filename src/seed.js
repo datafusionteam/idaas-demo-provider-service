@@ -236,7 +236,7 @@ const patient1 = {
  * Seeds the provider directory with data
  */
 const seed = async () => {
-  console.log(
+  logger.info(
     "Seeding provider HL7 FHIR server/directory. This may take a while..."
   );
 
