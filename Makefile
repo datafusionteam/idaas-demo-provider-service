@@ -2,12 +2,13 @@ help:
 	@echo "make"
 	@echo "    build"
 	@echo "        Build a new production docker instance."
-	@echo "    push"
-	@echo "        Push an already built production docker instance to AWS ECR."
+	@echo "    build-dev"
+	@echo "        Build a new dev docker instance."
 
 
 build:
 	./scripts/build.sh
 
-push:
-	./scripts/push.sh
+build-dev:
+	export DEV=true && \
+	./scripts/build.sh

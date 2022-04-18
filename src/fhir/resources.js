@@ -1,7 +1,17 @@
 /*
  * (C) Copyright Data Fusion Specialists. 2022
  *
- * SPDX-License-Identifier: Apache-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 const { v4: uuid } = require("uuid");
@@ -73,14 +83,18 @@ const generatePractictionerResource = async (i) => {
   const phoneNumber = await DataSynthesis.random.phoneNumber();
 
   const femaleImageUrls = [
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-5-2.jpg",
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-16-1.jpg",
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-31-1.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/female/1.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/female/2.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/female/3.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/female/4.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/female/5.jpg",
   ];
   const maleImageUrls = [
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/02/Website-Photo-17.jpg",
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-37-1.jpg",
-    "https://d5t4h5a9.rocketcdn.me/wp-content/uploads/2021/01/Professional-Headshot-Examples-38.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/male/1.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/male/2.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/male/3.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/male/4.jpg",
+    "https://s3.amazonaws.com/cdn.dfs.team/assets/chiropractor-headshots/male/5.jpeg",
   ];
 
   let imageUrl;
@@ -136,7 +150,7 @@ const generatePractictionerResource = async (i) => {
         country: "US",
       },
     ],
-    qualifications: [
+    qualification: [
       {
         identifier: [
           {

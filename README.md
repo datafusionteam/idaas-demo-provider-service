@@ -1,6 +1,6 @@
-# Pinnacle Chiropractic Provider Service
+# DFS Chiropractic Provider Service
 
-This is an example service which completes the DFS iDaaS POC demonstration. Pinnacle Chiropractic is a fictional chiropracter practice based in Georgia we use for the sake of the demonstration.
+This is an example service which completes the DFS iDaaS POC demonstration. DFS Chiropractic is a fictional chiropracter practice based in Georgia we use for the sake of the demonstration.
 
 ## What it Does
 

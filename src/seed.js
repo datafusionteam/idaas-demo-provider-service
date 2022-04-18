@@ -1,11 +1,22 @@
 /*
  * (C) Copyright Data Fusion Specialists. 2022
  *
- * SPDX-License-Identifier: Apache-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 const { FHIRServer } = require("./fhir");
 const config = require("./config");
+const logger = require("./logger");
 const { generatePractictionerResource } = require("./fhir/resources");
 
 // Hard code some fixed locations for provider
@@ -13,10 +24,10 @@ const { generatePractictionerResource } = require("./fhir/resources");
 const location1 = {
   resourceType: "Location",
   status: "active",
-  alias: ["atlanta", "atl", "pinnacle atl"],
-  name: "Pinnacle Chiropractic - Atlanta",
+  alias: ["atlanta", "atl", "dfs atl"],
+  name: "DFS Chiropractic - Atlanta",
   description:
-    "Welcome to Pinnacle Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
+    "Welcome to DFS Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
   telecom: [
     {
       system: "phone",
@@ -50,10 +61,10 @@ const location1 = {
 const location2 = {
   resourceType: "Location",
   status: "active",
-  alias: ["sandy springs", "pinnacle sandy springs"],
-  name: "Pinnacle Chiropractic - Sandy Springs",
+  alias: ["sandy springs", "dfs sandy springs"],
+  name: "DFS Chiropractic - Sandy Springs",
   description:
-    "Welcome to Pinnacle Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
+    "Welcome to DFS Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
   telecom: [
     {
       system: "phone",
@@ -87,10 +98,10 @@ const location2 = {
 const location3 = {
   resourceType: "Location",
   status: "active",
-  alias: ["fairfax", "pinnacle fairfax"],
-  name: "Pinnacle Chiropractic - Fairfax",
+  alias: ["fairfax", "dfs fairfax"],
+  name: "DFS Chiropractic - Fairfax",
   description:
-    "Welcome to Pinnacle Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
+    "Welcome to DFS Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
   telecom: [
     {
       system: "phone",
@@ -124,10 +135,10 @@ const location3 = {
 const location4 = {
   resourceType: "Location",
   status: "active",
-  alias: ["haymarket", "pinnacle haymarket"],
-  name: "Pinnacle Chiropractic - Haymarket",
+  alias: ["haymarket", "dfs haymarket"],
+  name: "DFS Chiropractic - Haymarket",
   description:
-    "Welcome to Pinnacle Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
+    "Welcome to DFS Chiropractic! Whether you're suffering debilitating pain from an injury, seek drug-free relief from the symptoms of a chronic condition, or just want to improve your overall state of health, you can benefit tremendously from meeting a skilled, experienced chiropractic team.",
   telecom: [
     {
       system: "phone",
@@ -160,12 +171,14 @@ const location4 = {
 
 const locationResources = [location1, location2, location3, location4];
 
+// Hard code the patient
+
 const patient1 = {
   resourceType: "Patient",
   identifier: [
     {
       system: "http://hl7.org/fhir/sid/us-ssn",
-      value: "721094426",
+      value: "111223456",
     },
   ],
   active: true,
@@ -180,60 +193,67 @@ const patient1 = {
   telecom: [
     {
       system: "phone",
-      value: "1112223333",
+      value: "+12223334444",
       use: "mobile",
-      rank: "1",
     },
     {
       system: "email",
       value: `sarahbaker@example.com`,
       use: "home",
-      rank: 2,
     },
   ],
   gender: "female",
-  birthDate: "12-01-98",
+  birthDate: "1984-04-02",
+  deceasedBoolean: false,
   address: [
     {
       use: "home",
-      type: "physical",
-      text: "123 Atlanta Rd",
+      line: ["123 Atlanta Ave SE"],
       city: "Atlanta",
       state: "GA",
-      postalCode: "30332",
+      postalCode: "30315",
       country: "US",
+      text: "123 Atlanta Ave SE, Atlanta, GA 30315",
     },
   ],
+  maritalStatus: {
+    coding: [
+      {
+        system: "http://snomed.info/sct",
+        code: "36629006",
+        display: "Legally married",
+      },
+      {
+        system: "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+        code: "M",
+      },
+    ],
+  },
+  multipleBirthBoolean: false,
 };
-
-const patientResources = [patient1];
 
 /**
  * Seeds the provider directory with data
  */
 const seed = async () => {
-  console.log(
+  logger.info(
     "Seeding provider HL7 FHIR server/directory. This may take a while..."
   );
 
   const fhirServer = new FHIRServer(config.hapiFhirUrl);
 
-  console.log(`Creating patient records`);
-  const patients = [];
-  for (const patientResource of patientResources) {
-    const patient = await fhirServer.create("Patient", patientResource);
-    patients.push(patient);
-  }
+  logger.info("Creating patient");
+  const patient = await fhirServer.create("Patient", patient1);
 
-  console.log("Creating locations");
+  logger.info("Creating locations");
   const locations = [];
   for (const locationResource of locationResources) {
     const location = await fhirServer.create("Location", locationResource);
     locations.push(location);
   }
 
-  const numPractitioners = 6;
-  console.log(`Creating ${numPractitioners} practitioners`);
+  const numPractitioners = 5;
+  logger.info(`Creating ${numPractitioners} practitioners`);
   const practitioners = [];
   for (let i = 0; i < numPractitioners; i++) {
     const practitionerResource = await generatePractictionerResource(i);
@@ -244,10 +264,10 @@ const seed = async () => {
     practitioners.push(practitioner);
   }
 
-  console.log("Done seeding");
+  logger.info("Done seeding");
 };
 
 seed().catch((error) => {
-  console.error(error);
+  logger.error(error);
   process.exit(1);
 });

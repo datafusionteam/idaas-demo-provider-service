@@ -1,7 +1,17 @@
 /*
  * (C) Copyright Data Fusion Specialists. 2022
  *
- * SPDX-License-Identifier: Apache-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 const kafka = require("./kafka");
@@ -12,6 +22,7 @@ const config = require("./config");
 const { refreshTokens } = require("./oauth");
 const createApi = require("./api");
 const { FHIRServer } = require("./fhir");
+const logger = require("./logger");
 
 const Topics = {
   FHIRAppointment: "fhirsvr_appointment",
@@ -32,8 +43,8 @@ const processMessage = async (topic, partition, key, value) => {
 };
 
 const handleAppointmentReceived = async (appointment) => {
-  console.log("Received a request to schedule an appointment");
-  console.log("Auto approving...");
+  logger.info("Received a request to schedule an appointment");
+  logger.info("Auto approving...");
   const client = new FHIRServer(config.hapiFhirUrl);
 
   const appointmentStart = appointment.start;
@@ -57,13 +68,15 @@ const handleAppointmentReceived = async (appointment) => {
   )[0];
   const locationId = locationParticipant.actor.identifier.value;
 
-  console.log("Fetching patient, practitioner, and location");
+  logger.info("Fetching patient, practitioner, and location");
+
   const [patient, practitioner, location] = await Promise.all([
     client.get("Patient", patientId),
     client.get("Practitioner", practitionerId),
     client.get("Location", locationId),
   ]);
-  console.log("Got resources");
+
+  logger.info("Got resources");
 
   const patientName = patient.name[0].text;
   const patientTelecoms = patient.telecom;
@@ -92,12 +105,12 @@ const handleAppointmentReceived = async (appointment) => {
     comment: "Scheduled using Coeus, powered by DFS", // Additional comments
   };
 
-  console.log("Constructed appointment response resource");
+  logger.info("Constructed appointment response resource");
+  logger.info("Creating event in provider outlook");
 
-  console.log("Creating event in provider outlook");
   const timezone = "US/Eastern"; // TODO: do not hard code this
-  let appointmentDescription = appointment.description;
 
+  let appointmentDescription = appointment.description;
   appointmentDescription += "\n";
   appointmentDescription += `Patient ID: ${patientId}\n`;
   appointmentDescription += `Patient Name: ${patientName}\n`;
@@ -143,17 +156,19 @@ const handleAppointmentReceived = async (appointment) => {
       })
       .then((response) => response.data);
   } catch (err) {
-    console.log("Error when creating provider outlook event");
-    console.log(err);
+    logger.error("Error when creating provider outlook event");
+    logger.error(err);
   }
-  console.log("Event created in provider outlook");
 
-  console.log("Sending response back to iDaaS-Connect...");
+  logger.info("Event created in provider outlook");
+  logger.info("Sending response back to iDaaS-Connect...");
+
   await axios.post(
     `${config.idaasConnectUrl}/projherophilus/appointmentresponse`,
     appointmentResponse
   );
-  console.log("Sent to iDaaS-Connect");
+
+  logger.info("Sent to iDaaS-Connect");
 };
 
 // Rrefresh access token every 30 min
@@ -176,7 +191,7 @@ const main = async () => {
 
   const api = createApi();
   api.listen(config.port, () =>
-    console.log(`Provider API listening on port ${config.port}`)
+    logger.info(`Provider API listening on port ${config.port}`)
   );
 
   await consumer.connect();
@@ -185,7 +200,7 @@ const main = async () => {
     topic: config.kafkaTopic,
   });
 
-  console.log(`Consumer listening for topic '${config.kafkaTopic}'`);
+  logger.info(`Consumer listening for topic '${config.kafkaTopic}'`);
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
@@ -197,8 +212,8 @@ const main = async () => {
           message.value ? JSON.parse(message.value.toString()) : null
         );
       } catch (e) {
-        console.error("Error processing message");
-        console.log(message);
+        logger.error("Error processing message");
+        logger.error(message);
         throw e;
       }
     },
@@ -206,11 +221,11 @@ const main = async () => {
 };
 
 main().catch(async (error) => {
-  console.error(error);
+  logger.error(error);
   try {
     await consumer.disconnect();
   } catch (e) {
-    console.error("Failed to gracefully disconnect consumer", e);
+    logger.error("Failed to gracefully disconnect consumer", e);
   }
   process.exit(1);
 });
