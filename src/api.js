@@ -51,7 +51,7 @@ const createApi = () => {
         patients[Math.floor(Math.random() * patients.length)].resource;
       res.status(200).json(patient);
     } catch (err) {
-      logger.error(err);
+      console.log(err);
       res.sendStatus(500);
     }
   });
@@ -70,7 +70,7 @@ const createApi = () => {
       const locations = results.map((result) => result.resource);
       res.status(200).json(locations);
     } catch (err) {
-      logger.error(err);
+      console.log(err);
       res.sendStatus(500);
     }
   });
@@ -85,7 +85,7 @@ const createApi = () => {
       const practitioners = results.map((result) => result.resource);
       res.status(200).json(practitioners);
     } catch (err) {
-      logger.error(err);
+      console.log(err);
       res.sendStatus(500);
     }
   });
@@ -180,11 +180,13 @@ const createApi = () => {
 
   // error handler
   app.use((err, req, res, next) => {
-    logger.error(err);
+    console.log(err);
 
     let status = err.status || 500;
     let code = err.code || "server_error";
     let message = err.message || "Internal server error";
+
+    logger.error(`${code} - ${message}`);
 
     if (!status) {
       status = 500;

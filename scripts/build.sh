@@ -4,8 +4,8 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 INFO="${bold}$(tput setaf 2)INFO   ${normal}"
 
-NAMESPACE=${NAMESPACE:-dfs}
-SERVICE=${SERVICE:-chiro-provider}
+NAMESPACE=${NAMESPACE:-idaas-demo}
+SERVICE=${SERVICE:-provider-service}
 VERSION=${VERSION:-$(cat package.json \
   | grep version \
   | head -1 \
