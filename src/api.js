@@ -45,11 +45,95 @@ const createApi = () => {
 
   api.get("/patient", async (req, res) => {
     try {
+      const email = req.query.email;
+      const phoneNumber = req.query.phoneNumber;
+
+      if (!birthDate || !phoneNumber) {
+        return res
+          .status(400)
+          .json({ error: "More input required", error_code: "bad_request" });
+      }
+
       const server = new FHIRServer(config.hapiFhirUrl);
-      const patients = await server.search("Patient");
-      const patient =
-        patients[Math.floor(Math.random() * patients.length)].resource;
-      res.status(200).json(patient);
+      const patients = await server.search("Patient", {
+        phone: phoneNumber,
+        email: email,
+      });
+
+      if (Array.isArray(patients) && patients.length > 0) {
+        const patient = patients[0].resource;
+        res.status(200).json(patient);
+      } else {
+        res
+          .status(404)
+          .json({ error: "No patient found", error_code: "patient_not_found" });
+      }
+    } catch (err) {
+      console.log(err);
+      res.sendStatus(500);
+    }
+  });
+
+  api.post("/patient", async (req, res) => {
+    try {
+      const server = new FHIRServer(config.hapiFhirUrl);
+      const formValues = req.body;
+
+      console.log({ newPatient: formValues });
+
+      const fullStreetAddressText =
+        `${formValues.address} ${formValues.address2}`.trim();
+
+      const patientResource = {
+        resourceType: "Patient",
+        active: true,
+        identifier: [
+          {
+            value: formValues.birthDate,
+          },
+          {
+            value: formValues.address,
+          },
+        ],
+        name: [
+          {
+            use: "official",
+            text: formValues.name,
+          },
+        ],
+        telecom: [
+          {
+            system: "phone",
+            value: formValues.phoneNumber,
+            use: "mobile",
+          },
+          {
+            system: "email",
+            value: formValues.email,
+            use: "home",
+          },
+        ],
+        gender:
+          formValues.sex === "M"
+            ? "male"
+            : formValues.sex === "F"
+            ? "female"
+            : "other",
+        birthDate: formValues.birthDate, // YYYY-MM-DD
+        address: [
+          {
+            use: "home",
+            line: [formValues.address, formValues.address2],
+            city: formValues.city,
+            state: formValues.state,
+            postalCode: formValues.zipCode,
+            country: formValues.country,
+            text: `${fullStreetAddressText}, ${formValues.city}, ${formValues.state} ${formValues.zipCode}`,
+          },
+        ],
+      };
+      const response = await server.create("Patient", patientResource);
+      res.status(200).json(response);
     } catch (err) {
       console.log(err);
       res.sendStatus(500);
@@ -187,14 +271,6 @@ const createApi = () => {
     let message = err.message || "Internal server error";
 
     logger.error(`${code} - ${message}`);
-
-    if (!status) {
-      status = 500;
-    }
-
-    if (!code) {
-      code = "server_error";
-    }
 
     res.status(err.status).json({
       status,

@@ -48,7 +48,12 @@ class FHIRServer {
       .post(`/${resourceType}`, JSON.stringify(resource), {
         headers: { "Content-Type": "application/json" },
       })
-      .then((result) => result.data);
+      .then((result) => {
+        if (typeof result.data === "string") {
+          return JSON.parse(result.data);
+        }
+        return result.data;
+      });
   };
 
   search = (resourceType, params) => {

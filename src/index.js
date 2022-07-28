@@ -171,7 +171,7 @@ const handleAppointmentReceived = async (appointment) => {
   logger.info("Sent to iDaaS-Connect");
 };
 
-// Rrefresh access token every 30 min
+// Refresh access token every 30 min
 cron.schedule("*/30 * * * *", async () => {
   await refreshTokens(
     config.oauth.tenantId,

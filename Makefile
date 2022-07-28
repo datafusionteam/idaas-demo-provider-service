@@ -9,6 +9,7 @@ help:
 build:
 	./scripts/build.sh
 
-build-dev:
+dev:
 	export DEV=true && \
 	./scripts/build.sh
+	kubectl rollout restart deployment -n idaas-demo provider-service
