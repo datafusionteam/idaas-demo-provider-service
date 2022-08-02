@@ -48,7 +48,7 @@ const createApi = () => {
       const email = req.query.email;
       const phoneNumber = req.query.phoneNumber;
 
-      if (!birthDate || !phoneNumber) {
+      if (!email || !phoneNumber) {
         return res
           .status(400)
           .json({ error: "More input required", error_code: "bad_request" });
