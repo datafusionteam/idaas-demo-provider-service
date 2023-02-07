@@ -1,15 +1,11 @@
 FROM node:14.17 as base
 
-# install node-prune (https://github.com/tj/node-prune)
-RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
-
 WORKDIR /app
 
 COPY --chown=node:node package.json yarn.lock ./
 COPY --chown=node:node src ./src
 
 RUN yarn install --frozen-lockfile
-RUN /usr/local/bin/node-prune
 
 FROM base as dev
 
