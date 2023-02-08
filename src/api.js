@@ -48,17 +48,19 @@ const createApi = () => {
       const email = req.query.email;
       const phoneNumber = req.query.phoneNumber;
 
-      if (!email || !phoneNumber) {
+      if (!email) {
         return res
           .status(400)
           .json({ error: "More input required", error_code: "bad_request" });
       }
 
+      const searchParams = { email };
+
+      if (phoneNumber) {
+        searchParams.phoneNumber = phoneNumber;
+      }
       const server = new FHIRServer(config.hapiFhirUrl);
-      const patients = await server.search("Patient", {
-        phone: phoneNumber,
-        email: email,
-      });
+      const patients = await server.search("Patient", searchParams);
 
       if (Array.isArray(patients) && patients.length > 0) {
         const patient = patients[0].resource;
