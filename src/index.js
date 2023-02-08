@@ -109,61 +109,6 @@ const handleAppointmentReceived = async (appointment) => {
   };
 
   logger.info("Constructed appointment response resource");
-  logger.info("Creating event in provider outlook");
-
-  // const timezone = "US/Eastern"; // TODO: do not hard code this
-
-  // let appointmentDescription = appointment.description;
-  // appointmentDescription += "\n";
-  // appointmentDescription += `Patient ID: ${patientId}\n`;
-  // appointmentDescription += `Patient Name: ${patientName}\n`;
-  // appointmentDescription += `Location ID: ${locationId}\n`;
-  // appointmentDescription += `Location: ${locationName}\n`;
-  // appointmentDescription += `Requested practitioner ID: ${practitionerId}\n`;
-  // appointmentDescription += `Requested practitioner name: ${practitionerName}`;
-
-  // const appointmentStartTime = {
-  //   dateTime: appointmentStart,
-  //   timezone,
-  // };
-  // const appointmentEndTime = {
-  //   dateTime: appointmentEnd,
-  //   timezone,
-  // };
-  // const createEventUrl = "https://graph.microsoft.com/v1.0/me/calendar/events";
-  // const createEventPayload = {
-  //   subject: "Appointment",
-  //   body: { contentType: "text", content: appointmentDescription },
-  //   start: appointmentStartTime,
-  //   end: appointmentEndTime,
-  //   showAs: "busy",
-  //   attendees: [],
-  //   location: {
-  //     displayName: location.name,
-  //     address: {
-  //       city: location.address.city,
-  //       postalCode: location.address.postalCode,
-  //       state: location.address.state,
-  //       street: location.address.text.split(",")[0],
-  //     },
-  //     locationType: "businessAddress",
-  //   },
-  // };
-
-  // try {
-  //   await axios
-  //     .post(createEventUrl, createEventPayload, {
-  //       headers: {
-  //         Authorization: `Bearer ${process.env.PROVIDER_ACCESS_TOKEN}`,
-  //       },
-  //     })
-  //     .then((response) => response.data);
-  // } catch (err) {
-  //   logger.error("Error when creating provider outlook event");
-  //   logger.error(err);
-  // }
-
-  // logger.info("Event created in provider outlook");
   logger.info("Sending response back to iDaaS-Connect...");
 
   await axios.post(
