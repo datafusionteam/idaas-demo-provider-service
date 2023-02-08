@@ -26,7 +26,7 @@ const ssl = !!sasl;
 const kafka = new Kafka({
   clientId: "dfs-chiro-provider-service",
   brokers: [process.env.KAFKA_BOOTSTRAP_SERVER],
-  logLevel: logLevel.ERROR,
+  logLevel: logLevel.INFO,
   ssl,
   sasl,
   retry: {

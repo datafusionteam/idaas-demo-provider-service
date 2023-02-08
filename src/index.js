@@ -30,6 +30,11 @@ const consumer = kafka.consumer({
   groupId: process.env.KAFKA_CONSUMER_GROUP_ID,
 });
 
+consumer.on("consumer.crash", () => {
+  logger.error("Consumer crashed");
+  process.exit(1);
+});
+
 const processMessage = async (topic, partition, key, value) => {
   switch (topic) {
     case Topics.FHIRAppointment:
